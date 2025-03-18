@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta CEP - ViaCEP</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            width: 350px;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            text-align: left;
+            margin-top: 10px;
+            color: #555;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+
+        .info {
+            font-size: 14px;
+            color: #888;
+            margin-top: 10px;
+        }
+    </style>
+
+    <script>
+        function limpa_formulário_cep() {
+            document.getElementById('rua').value = "";
+            document.getElementById('cidade').value = "";
+        }
+
+        function meu_callback(conteudo) {
+            if (!("erro" in conteudo)) {
+                document.getElementById('rua').value = conteudo.logradouro;
+                document.getElementById('cidade').value = conteudo.localidade;
+            } else {
+                limpa_formulário_cep();
+                alert("CEP não encontrado.");
+            }
+        }
+
+        function pesquisacep(valor) {
+            var cep = valor.replace(/\D/g, '');
+            if (cep != "") {
+                var validacep = /^[0-9]{8}$/;
+                if (validacep.test(cep)) {
+                    document.getElementById('rua').value = "...";
+                    document.getElementById('cidade').value = "...";
+    
+                    var script = document.createElement('script');
+                    script.src = 'https://viacep.com.br/ws/' + cep + '/json/?callback=meu_callback';
+                    document.body.appendChild(script);
+                } else {
+                    limpa_formulário_cep();
+                    alert("Formato de CEP inválido.");
+                }
+            } else {
+                limpa_formulário_cep();
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h2>Consulta de CEP</h2>
+        <form>
+            <label for="cep">CEP:</label>
+            <input name="cep" type="text" id="cep" maxlength="9" placeholder="Digite o CEP" onblur="pesquisacep(this.value);" />
+
+            <label for="rua">Rua:</label>
+            <input name="rua" type="text" id="rua" readonly />
+
+            <label for="cidade">Cidade:</label>
+            <input name="cidade" type="text" id="cidade" readonly />
+
+
+            <p class="info">Digite o CEP e pressione <b>Tab</b> ou clique fora do campo para buscar os dados.</p>
+        </form>
+    </div>
+</body>
+</html>
